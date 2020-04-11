@@ -44,7 +44,7 @@ class VKMConsoleManager: NSObject, GCDAsyncSocketDelegate, NSTableViewDataSource
         self.performSelector(inBackground: #selector(self.detectConsoles), with: self)
     }
     
-    func detectConsoles(sender: Any) {
+    @objc func detectConsoles(sender: Any) {
         // Create a Task instance
         let task = Process()
         
@@ -114,7 +114,8 @@ class VKMConsoleManager: NSObject, GCDAsyncSocketDelegate, NSTableViewDataSource
 //                NSLog("urlString \(fileItem.clientURL?.relativePath)")
                 let index = urlString?.index(after: (urlString?.startIndex)!)
 //                print("index \(index)")
-                singleURL = hostURL.appendingPathComponent((urlString?.substring(from: index!))!)
+                singleURL = hostURL.appendingPathComponent(String(((urlString?[index!...])!)))
+                
 //                NSLog("singleURL \(singleURL)")
             }
             urlData.append((singleURL.absoluteString+"\n").data(using: String.Encoding.utf8)!)
@@ -147,7 +148,7 @@ class VKMConsoleManager: NSObject, GCDAsyncSocketDelegate, NSTableViewDataSource
     
     @objc public func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
         if(err != nil) {
-            print("Socket disconnected, error \(err)")
+            print("Socket disconnected, error \(String(describing: err))")
         } else {
             print("Socket disconnected. All done.")
         }

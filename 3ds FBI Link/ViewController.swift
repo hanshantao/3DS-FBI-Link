@@ -77,6 +77,7 @@ class ViewController: NSViewController, ConsoleManagementDelegate, VKMLoggingDel
         }
     }
 
+    
     func stopServing() {
         self.logStatus("Shutting down.\n")
         fileManager?.stopServing()
@@ -84,6 +85,7 @@ class ViewController: NSViewController, ConsoleManagementDelegate, VKMLoggingDel
         self.status.setValue("Start", forKey: "actionTitle")
     }
     
+
     func startServing() {
         NSLog("Hi")
         fileManager?.startServing()

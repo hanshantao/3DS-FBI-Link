@@ -26,15 +26,15 @@ class VKMFullView : NSView {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
 //        Swift.print("Awaking view from coder")
-        register(forDraggedTypes: [NSFilenamesPboardType])
+        registerForDraggedTypes(convertToNSPasteboardPasteboardTypeArray([NSPasteboard.PasteboardType.fileURL.rawValue]))
 
     }
     
     override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
 //        Swift.print("Dragging entered")
-        let sourceDragMask = sender.draggingSourceOperationMask()
-        let pboard = sender.draggingPasteboard()
-        if pboard.availableType(from: [NSFilenamesPboardType]) == NSFilenamesPboardType {
+        let sourceDragMask = sender.draggingSourceOperationMask
+        let pboard = sender.draggingPasteboard
+        if pboard.availableType(from: convertToNSPasteboardPasteboardTypeArray([NSPasteboard.PasteboardType.fileURL.rawValue])) == NSPasteboard.PasteboardType.fileURL {
             if sourceDragMask.rawValue & NSDragOperation.generic.rawValue != 0 {
                 return NSDragOperation.copy
             }
@@ -54,9 +54,9 @@ class VKMFullView : NSView {
         // ... perform your magic
         // return true/false depending on success
 //        Swift.print("perform drag")
-        let pasteboard = sender.draggingPasteboard()
-        if ( pasteboard.types?.contains(NSFilenamesPboardType) )! {
-            delegate?.received(files: pasteboard.propertyList(forType: NSFilenamesPboardType) as! [String])
+        let pasteboard = sender.draggingPasteboard
+        if ( convertFromOptionalNSPasteboardPasteboardTypeArray(pasteboard.types)?.contains(NSPasteboard.PasteboardType.fileURL.rawValue) )! {
+            delegate?.received(files: pasteboard.propertyList(forType: convertToNSPasteboardPasteboardType(NSPasteboard.PasteboardType.fileURL.rawValue)) as! [String])
         }
         return true
     }
@@ -70,10 +70,10 @@ class VKMFullView : NSView {
             return false
         }
     }
-    func open(_ sender: Any?) {
+    @objc func open(_ sender: Any?) {
         self.addFilesAndFolders(self)
     }
-    func addURL(_ sender: Any?) {
+    @objc func addURL(_ sender: Any?) {
         self.addURLs(self)
     }
     
@@ -84,7 +84,7 @@ class VKMFullView : NSView {
         openPanel.canChooseFiles = true
         openPanel.allowedFileTypes = ["cia", "tik"]
         openPanel.begin() { modalResponse in
-            if (modalResponse == NSFileHandlingPanelOKButton) {
+            if (modalResponse.rawValue == NSApplication.ModalResponse.OK.rawValue) {
                 let paths = openPanel.urls.map {$0.path}
                 self.delegate?.received(files: paths)
             }
@@ -107,7 +107,7 @@ class VKMFullView : NSView {
         alert.addButton(withTitle: "Cancel")
         let button = alert.runModal()
 //        Swift.print("returned button \(button)")
-        if (button == NSAlertFirstButtonReturn) {
+        if (button == NSApplication.ModalResponse.alertFirstButtonReturn) {
             
 //            Swift.print("First button return")
             let url = URL(string: inputView.stringValue)
@@ -121,4 +121,20 @@ class VKMFullView : NSView {
             return
         }
     }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToNSPasteboardPasteboardTypeArray(_ input: [String]) -> [NSPasteboard.PasteboardType] {
+	return input.map { key in NSPasteboard.PasteboardType(key) }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromOptionalNSPasteboardPasteboardTypeArray(_ input: [NSPasteboard.PasteboardType]?) -> [String]? {
+	guard let input = input else { return nil }
+	return input.map { key in key.rawValue }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToNSPasteboardPasteboardType(_ input: String) -> NSPasteboard.PasteboardType {
+	return NSPasteboard.PasteboardType(rawValue: input)
 }

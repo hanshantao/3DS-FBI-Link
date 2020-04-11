@@ -5,6 +5,6 @@ target '3DS FBI Link' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
   # Pods for 3ds FBI Link
-  pod 'CocoaAsyncSocket'
-  pod 'GCDWebServer'
+  pod 'CocoaAsyncSocket', '=7.5.1'
+  pod 'GCDWebServer', '=3.3.3'
 end
